@@ -19,12 +19,15 @@ var connection = mysql.createConnection({
 //Function acts like a "homebase" for the customer, runs functions that 
 //display DB items and asks customer what they'd like to do
 function startCustomer() {
-    connection.connect(function (err) {
-        if (err) throw err;
-        console.log("connected as id " + connection.threadId);
-        displayDB();
-        connection.end();
-    });
+    displayDB();
+    askCustomer();
+    // connection.connect(function (err) {
+    //     if (err) throw err;
+    //     console.log("connected as id " + connection.threadId);
+    //     displayDB();
+    //     askCustomer();
+    //     connection.end();
+    // });
 }
 
 //This function displays the products available from the DB
@@ -33,9 +36,9 @@ function displayDB(err, res) {
         if (err) throw err;
         //Empty array that will be used by console.table
         var displayArr = [];
-        
+
         //ForEach goes through each result from the DB
-        res.forEach(function(obj){
+        res.forEach(function (obj) {
             //Makes a new empty object
             var product = {};
             //Adds values to the object
@@ -44,7 +47,7 @@ function displayDB(err, res) {
             product.Department = obj.dept_name;
             product.Price = obj.price;
             product.Quantity = obj.stock_quantity;
-            
+
             //Pushes object to the displayArr
             displayArr.push(product);
         })
@@ -54,7 +57,28 @@ function displayDB(err, res) {
     })
 }
 
+function askCustomer() {
+    connection.query("SELECT * FROM products", function (DbRes, err) {
+        if (err) throw err;
+        console.log(DbRes);
+        inquirer.prompt([
+            {
+                type: "input",
+                name: "select-item",
+                message: "Which item would you like to purchase?"
+            },
+            {
+                type: "input",
+                name: "select-quantity",
+                message: "How many would you like to purchase?"
+            }
+        ]).then(function (UserRes) {
+            console.log(UserRes);
 
+        })
+    })
+
+}
 
 startCustomer();
 
