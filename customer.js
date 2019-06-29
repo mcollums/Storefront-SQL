@@ -23,6 +23,16 @@ connection.connect(function(err) {
     connection.end();
   });
 
+  //This function displays all DB products to the console
+  function displayBamazon() {
+      connection.query("SELECT * FROM products", function(res,err){
+          if(err) throw err;
+          console.log(res);
+      })
+  }
+
+  displayBamazon();
+
   //The program automatically shows the product database as a table
         //Show ids, name, price, stock, dept
   //Prompt the user with inquirer
