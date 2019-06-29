@@ -6,32 +6,47 @@ var table = require("console.table")
 
 
 var connection = mysql.createConnection({
-  host: "localhost",
-  // Your port; if not 3306
-  port: 3306,
-  // Your username
-  user: "root",
-  // Your password
-  password: process.env.DB_PASSWORD,
-  database: "bamazonDB"
+    host: "localhost",
+    // Your port; if not 3306
+    port: 3306,
+    // Your username
+    user: "root",
+    // Your password
+    password: process.env.DB_PASSWORD,
+    database: "bamazonDB"
 });
 
-connection.connect(function(err) {
-    if (err) throw err;
-    console.log("connected as id " + connection.threadId);
-    // afterConnection();
-    connection.end();
-  });
+function displayDB(err, res) {
+    connection.query("SELECT * FROM products", function (err, res) {
+        if (err) throw err;
+        
+        var displayArr = [];
+        
+        res.forEach(function(obj){
+            var product = {};
+            product.ID = obj.item_id;
+            product.Name = obj.product_name;
+            product.Department = obj.dept_name;
+            product.Price = obj.price;
+            product.Quantity = obj.stock_quantity;
+        
+            displayArr.push(product);
+        })
+        console.log("\n");
+        console.table(displayArr);
+    })
+}
 
-  //This function displays all DB products to the console
-  function displayBamazon() {
-      connection.query("SELECT * FROM products", function(res,err){
-          if(err) throw err;
-          console.log(res);
-      })
-  }
+function connectDB() {
+    connection.connect(function (err) {
+        if (err) throw err;
+        console.log("connected as id " + connection.threadId);
+        displayDB();
+        connection.end();
+    });
+}
 
-  displayBamazon();
+connectDB();
 
   //The program automatically shows the product database as a table
         //Show ids, name, price, stock, dept
