@@ -2,7 +2,8 @@ require("dotenv").config();
 var chalk = require("chalk");
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-var string = "";
+var table = require("console.table")
+
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -21,3 +22,16 @@ connection.connect(function(err) {
     // afterConnection();
     connection.end();
   });
+
+  //The program automatically shows the product database as a table
+        //Show ids, name, price, stock, dept
+  //Prompt the user with inquirer
+        //Ask which product id they'd like to buy
+        //How many units of that product?
+        //THEN...
+        //If there ARE ENOUGH products 
+            //Update the DB to reflect the new quantity
+            //Show customer total cost of purchase
+            //"Go back to Homescreen Functions"
+        //If there are NOT ENOUGH products
+            //log "Insufficient Quantity"
