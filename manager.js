@@ -38,11 +38,11 @@ function whatAction() {
 
         switch (action) {
             case "View Products for Sale":
-                  viewProducts();
+                viewProducts();
                 console.log(chalk.green("You chose to View Products"));
                 break;
             case "View Low Inventory":
-                //   lowInventory();
+                lowInventory();
                 console.log(chalk.green("You chose to View Low Inventory"));
                 break;
             case "Add to Inventory":
@@ -66,7 +66,7 @@ function whatAction() {
 // Make the response a table using console.table
 
 //Ask user what they'd like to do next
-function viewProducts(){
+function viewProducts() {
     //Starts query to DB for all products
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
@@ -103,6 +103,45 @@ function viewProducts(){
 //Display items only if the quantity is less than 5
 //Make the response a table using console.table
 //Ask user what they'd like to do next
+function lowInventory() {
+    //Starts query to DB for all products
+    connection.query("SELECT * FROM products", function (err, res) {
+        if (err) throw err;
+
+        //Empty array that will be used by console.table
+        var displayArr = [];
+
+        //ForEach goes through each result from the DB
+        res.forEach(function (obj) {
+            if (obj.stock_quantity <= 5) {
+                //Makes a new empty object
+                var product = {};
+
+                //Adds values to the object
+                product.ID = obj.item_id;
+                product.Name = obj.product_name;
+                product.Department = obj.dept_name;
+                product.Price = obj.price;
+                product.Quantity = obj.stock_quantity;
+
+                //Pushes object to the displayArr
+                displayArr.push(product);
+            }
+        })
+        
+        //Display product table in console
+        console.log("\n");
+        if (displayArr.length === 0) {
+            console.table(chalk.blue("There are no products with low inventory"));
+
+        } else {
+            console.table(displayArr);
+        }
+
+        //Calls prompt function
+        whatAction();
+    })
+}
 
 //Add to Inventory
 // Prompt user to chooose which item they'd like to add inventory for
