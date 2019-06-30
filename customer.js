@@ -102,13 +102,13 @@ function askCustomer() {
             if (err) throw (err);
 
             if (data.length === 0) {
-                console.log("Please enter a valid item id");
+                console.log(chalk.red("Please enter a valid item id"));
                 displayDB();
             } else {
                 // console.log('data = ' + JSON.stringify(data));
                 var productData = data[0];
                 if (quantity <= productData.stock_quantity) {
-                    console.log("Great, there are enough " + productData.product_name + " to purchase. Placing your order...");
+                    console.log(chalk.blue("Great, there are enough " + productData.product_name + " to purchase. Placing your order..."));
                     var newQuantity = parseFloat(productData.stock_quantity) - parseFloat(quantity);
                     var updateQueryString = 'UPDATE products SET stock_quantity=\"' + newQuantity + '\" WHERE item_id= \"' + item + "\"";
                     connection.query(updateQueryString, function (err, data) {
