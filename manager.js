@@ -22,7 +22,8 @@ var connection = mysql.createConnection({
 // Add to Inventory
 // Add New Product
 // When user selects one of these options, run the cooresponding function.
-//This function asks the user if they'd like to make another purchase
+
+// This function asks the user if they'd like to make another purchase
 function whatAction() {
     inquirer.prompt([
         {
@@ -37,32 +38,65 @@ function whatAction() {
 
         switch (action) {
             case "View Products for Sale":
-                //   viewProducts();
-                console.log("You chose to View Products");
+                  viewProducts();
+                console.log(chalk.green("You chose to View Products"));
                 break;
             case "View Low Inventory":
                 //   lowInventory();
-                console.log("You chose to View Low Inventory");
+                console.log(chalk.green("You chose to View Low Inventory"));
                 break;
             case "Add to Inventory":
                 //   addInventory();
-                console.log("You chose to Add to Inventory");
+                console.log(chalk.green("You chose to Add to Inventory"));
                 break;
             case "Add New Product":
                 //   addProduct();
-                console.log("You chose to Add a New Product");
+                console.log(chalk.green("You chose to Add a New Product"));
                 break;
             case "Exit":
-                console.log("You chose to Exit the Manager Program");
+                console.log(chalk.green("You chose to Exit the Manager Program"));
                 process.exit();
                 break;
         }
     })
 }
+
 //View Products Function
 // Connection query for all DB Columns
 // Make the response a table using console.table
+
 //Ask user what they'd like to do next
+function viewProducts(){
+    //Starts query to DB for all products
+    connection.query("SELECT * FROM products", function (err, res) {
+        if (err) throw err;
+
+        //Empty array that will be used by console.table
+        var displayArr = [];
+
+        //ForEach goes through each result from the DB
+        res.forEach(function (obj) {
+            //Makes a new empty object
+            var product = {};
+
+            //Adds values to the object
+            product.ID = obj.item_id;
+            product.Name = obj.product_name;
+            product.Department = obj.dept_name;
+            product.Price = obj.price;
+            product.Quantity = obj.stock_quantity;
+
+            //Pushes object to the displayArr
+            displayArr.push(product);
+        })
+        //Display product table in console
+        console.log("\n");
+        console.table(displayArr);
+
+        //Calls prompt function
+        whatAction();
+    })
+}
 
 //View Low Inventory
 //Connection Query for all DB Columns
@@ -87,3 +121,4 @@ function whatAction() {
 //if no, ask what they'd like to do next
 
 whatAction();
+// viewProducts();
