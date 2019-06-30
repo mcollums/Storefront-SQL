@@ -21,7 +21,9 @@ function validateInput(value) {
     var integer = Number.isInteger(parseFloat(value));
     var sign = Math.sign(value);
 
-    if (integer && (sign === 1)) {
+    if (value === "q") {
+        process.exit();
+    } else if (integer && (sign === 1)) {
         return true;
     } else {
         return 'Please enter a whole non-zero number.';
@@ -64,8 +66,8 @@ function goAgain() {
             message: "Would you like to make another purchase?",
             choices: ["Yes", "No"]
         }
-    ]).then(function (res){
-        if(res === "yes"){
+    ]).then(function (res) {
+        if (res === "yes") {
             displayDB();
         } else {
             process.exit();
@@ -80,14 +82,12 @@ function askCustomer() {
             name: "selectItem",
             message: "Which item would you like to purchase? Press Q to exit.",
             validate: validateInput,
-            filter: Number
         },
         {
             type: "input",
             name: "selectQuantity",
             message: "How many would you like to purchase? Press Q to exit.",
             validate: validateInput,
-            filter: Number
         }
     ]).then(function (UserRes) {
         if (UserRes == "q") {
@@ -119,7 +119,7 @@ function askCustomer() {
                         var total = parseFloat(productData.price) * parseFloat(quantity);
                         console.log(chalk.blue("Your order has been placed! Your total is $" + total + "."));
                         console.log(chalk.blue("\n============================================================"));
-                        connection.end(); 
+                        connection.end();
                         goAgain();
                     })
                 } else {
