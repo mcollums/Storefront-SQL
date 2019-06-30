@@ -18,29 +18,17 @@ var connection = mysql.createConnection({
 
 // validateInput makes sure that the user is supplying only positive integers for their inputs
 function validateInput(value) {
-	var integer = Number.isInteger(parseFloat(value));
-	var sign = Math.sign(value);
+    var integer = Number.isInteger(parseFloat(value));
+    var sign = Math.sign(value);
 
-	if (integer && (sign === 1)) {
-		return true;
-	} else {
-		return 'Please enter a whole non-zero number.';
-	}
+    if (value === "q") {
+        process.exit();
+    } else if (integer && (sign === 1)) {
+        return true;
+    } else {
+        return 'Please enter a whole non-zero number.';
+    }
 }
-
-//Function acts like a "homebase" for the customer, runs functions that 
-//display DB items and asks customer what they'd like to do
-// function startCustomer() {
-//     displayDB();
-//     askCustomer();
-//     // connection.connect(function (err) {
-//     //     if (err) throw err;
-//     //     console.log("connected as id " + connection.threadId);
-//     //     displayDB();
-//     //     askCustomer();
-//     //     connection.end();
-//     // });
-// }
 
 //This function displays the products available from the DB
 function displayDB() {
@@ -70,72 +58,77 @@ function displayDB() {
     askCustomer();
 }
 
-function askCustomer() {
-    connection.query("SELECT * FROM products", function (err, DbRes) {
-        if (err) throw err;
-   
-        // console.log(DbRes);
-        inquirer.prompt([
-            {
-                type: "input",
-                name: "selectItem",
-                message: "Which item would you like to purchase?",
-                validate: validateInput,
-			    filter: Number
-            },
-            {
-                type: "input",
-                name: "selectQuantity",
-                message: "How many would you like to purchase?",
-                validate: validateInput,
-			    filter: Number
-            }
-        ]).then(function (UserRes) {
-
-            // console.log(UserRes);
-            var itemNum = UserRes.selectItem;
-            var itemQuan = UserRes.selectQuantity;
-
-            // Query db to confirm that the given item ID exists in the desired quantity
-		    var queryStr = 'SELECT * FROM products WHERE ?';
-
-            DbRes.forEach(function (obj) {
-                if (itemNum == obj.item_id) {
-                    console.log("You've chosen " + obj.product_name);
-                    if (itemQuan <= obj.stock_quantity) {
-                        // console.log("There are enough of those in stock!");
-                        var newQuan = parseFloat(obj.stock_quantity) - parseFloat(itemQuan);
-                        var query = connection.query(
-                            "UPDATE products SET ? WHERE ?",
-                            [
-                                {
-                                    stock_quantity: newQuan
-                                },
-                                {
-                                    item_id: itemNum
-                                }
-                            ],
-                            function (err, res) {
-                                if (err) throw err;
-                                //   console.log(res.affectedRows + " products updated!\n");
-
-                            }
-                        );
-                        // console.log(query.sql);
-
-                        var total = parseFloat(obj.price) * itemQuan;
-                        console.log("Your total is $" + total + ".");
-                    } else {
-                        console.log("Sorry, there aren't enough in stock");
-                    }
-                }
-            })
+function goAgain() {
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "confirm",
+            message: "Would you like to make another purchase?",
+            choices: ["Yes", "No"]
+        }
+    ]).then(function (res) {
+        if (res === "yes") {
             displayDB();
+        } else {
+            process.exit();
+        }
+    })
+}
+
+function askCustomer() {
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "selectItem",
+            message: "Which item would you like to purchase? Press Q to exit.",
+            validate: validateInput,
+        },
+        {
+            type: "input",
+            name: "selectQuantity",
+            message: "How many would you like to purchase? Press Q to exit.",
+            validate: validateInput,
+        }
+    ]).then(function (UserRes) {
+
+        // console.log(UserRes);
+        var item = UserRes.selectItem;
+        var quantity = UserRes.selectQuantity;
+
+        // Query db to confirm that the given item ID exists in the desired quantity
+        var queryStr = 'SELECT * FROM products WHERE ?';
+
+        connection.query(queryStr, { item_id: item }, function (err, data) {
+            if (err) throw (err);
+
+            if (data.length === 0) {
+                console.log(chalk.red("Please enter a valid item id"));
+                displayDB();
+            } else {
+                // console.log('data = ' + JSON.stringify(data));
+                var productData = data[0];
+                if (quantity <= productData.stock_quantity) {
+                    console.log(chalk.blue("Great, there are enough " + productData.product_name + " to purchase. Placing your order..."));
+                    var newQuantity = parseFloat(productData.stock_quantity) - parseFloat(quantity);
+                    var updateQueryString = 'UPDATE products SET stock_quantity=\"' + newQuantity + '\" WHERE item_id= \"' + item + "\"";
+                    connection.query(updateQueryString, function (err, data) {
+                        if (err) throw err;
+                        var total = parseFloat(productData.price) * parseFloat(quantity);
+                        console.log(chalk.blue("Your order has been placed! Your total is $" + total + "."));
+                        console.log(chalk.blue("\n============================================================"));
+                        connection.end();
+                        goAgain();
+                    })
+                } else {
+                    console.log(chalk.red("\n Sorry, there is not enough product in stock. Please modify your order."));
+                    console.log(chalk.red("============================================================\n"));
+                    displayDB();
+                }
+            }
         })
     })
 }
 
-// startCustomer();
 displayDB();
 
   //The program automatically shows the product database as a table
