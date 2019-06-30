@@ -17,34 +17,73 @@ var connection = mysql.createConnection({
 });
 
 //Show list of options
-    // View Products for sale
-    // View Low Inventory
-    // Add to Inventory
-    // Add New Product
-    // When user selects one of these options, run the cooresponding function.
+// View Products for sale
+// View Low Inventory
+// Add to Inventory
+// Add New Product
+// When user selects one of these options, run the cooresponding function.
+//This function asks the user if they'd like to make another purchase
+function whatAction() {
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "user_action",
+            message: "Would you like to do?",
+            choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product", "Exit"]
+        }
+    ]).then(function (res) {
+        // console.log(res.user_action);
+        var action = res.user_action;
 
+        switch (action) {
+            case "View Products for Sale":
+                //   viewProducts();
+                console.log("You chose to View Products");
+                break;
+            case "View Low Inventory":
+                //   lowInventory();
+                console.log("You chose to View Low Inventory");
+                break;
+            case "Add to Inventory":
+                //   addInventory();
+                console.log("You chose to Add to Inventory");
+                break;
+            case "Add New Product":
+                //   addProduct();
+                console.log("You chose to Add a New Product");
+                break;
+            case "Exit":
+                console.log("You chose to Exit the Manager Program");
+                process.exit();
+                break;
+        }
+    })
+}
 //View Products Function
-    // Connection query for all DB Columns
-    // Make the response a table using console.table
-    //Ask user what they'd like to do next
+// Connection query for all DB Columns
+// Make the response a table using console.table
+//Ask user what they'd like to do next
+
 //View Low Inventory
-    //Connection Query for all DB Columns
-        //Display items only if the quantity is less than 5
-        //Make the response a table using console.table
-        //Ask user what they'd like to do next
+//Connection Query for all DB Columns
+//Display items only if the quantity is less than 5
+//Make the response a table using console.table
+//Ask user what they'd like to do next
 
 //Add to Inventory
-    // Prompt user to chooose which item they'd like to add inventory for
-    // Prompt user for how many they'd like to restock
-    // If item-id isn't in DB, let user know that's not a valid response
-    //Ask user what they'd like to do next
+// Prompt user to chooose which item they'd like to add inventory for
+// Prompt user for how many they'd like to restock
+// If item-id isn't in DB, let user know that's not a valid response
+//Ask user what they'd like to do next
 
 //Add New Product
-    // Prompt user for the product...
-        //Name
-        //Price
-        //Quantity
-        //Select a Department from List
-        //Then use connection query to add those values to DB
-    //Ask user if they'd like to add another product..
-        //if no, ask what they'd like to do next
+// Prompt user for the product...
+//Name
+//Price
+//Quantity
+//Select a Department from List
+//Then use connection query to add those values to DB
+//Ask user if they'd like to add another product..
+//if no, ask what they'd like to do next
+
+whatAction();
