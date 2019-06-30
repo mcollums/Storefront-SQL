@@ -78,18 +78,21 @@ function askCustomer() {
         {
             type: "input",
             name: "selectItem",
-            message: "Which item would you like to purchase?",
+            message: "Which item would you like to purchase? Press Q to exit.",
             validate: validateInput,
             filter: Number
         },
         {
             type: "input",
             name: "selectQuantity",
-            message: "How many would you like to purchase?",
+            message: "How many would you like to purchase? Press Q to exit.",
             validate: validateInput,
             filter: Number
         }
     ]).then(function (UserRes) {
+        if (UserRes == "q") {
+            process.exit();
+        }
 
         // console.log(UserRes);
         var item = UserRes.selectItem;
@@ -105,7 +108,7 @@ function askCustomer() {
                 console.log("Please enter a valid item id");
                 displayDB();
             } else {
-                console.log('data = ' + JSON.stringify(data));
+                // console.log('data = ' + JSON.stringify(data));
                 var productData = data[0];
                 if (quantity <= productData.stock_quantity) {
                     console.log("Great, there are enough " + productData.product_name + " to purchase. Placing your order...");
@@ -114,14 +117,14 @@ function askCustomer() {
                     connection.query(updateQueryString, function (err, data) {
                         if (err) throw err;
                         var total = parseFloat(productData.price) * parseFloat(quantity);
-                        console.log("Your order has been placed! Your total is $" + total + ".");
-                        console.log("\n============================================================");
+                        console.log(chalk.blue("Your order has been placed! Your total is $" + total + "."));
+                        console.log(chalk.blue("\n============================================================"));
                         connection.end(); 
                         goAgain();
                     })
                 } else {
-                    console.log("Sorry, there is not enough product in stock. Please modify your order.");
-                    console.log("\n============================================================");
+                    console.log(chalk.red("\n Sorry, there is not enough product in stock. Please modify your order."));
+                    console.log(chalk.red("============================================================\n"));
                     displayDB();
                 }
             }
