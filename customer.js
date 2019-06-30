@@ -90,9 +90,6 @@ function askCustomer() {
             validate: validateInput,
         }
     ]).then(function (UserRes) {
-        if (UserRes == "q") {
-            process.exit();
-        }
 
         // console.log(UserRes);
         var item = UserRes.selectItem;
