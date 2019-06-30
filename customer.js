@@ -16,19 +16,31 @@ var connection = mysql.createConnection({
     database: "bamazonDB"
 });
 
+// validateInput makes sure that the user is supplying only positive integers for their inputs
+function validateInput(value) {
+	var integer = Number.isInteger(parseFloat(value));
+	var sign = Math.sign(value);
+
+	if (integer && (sign === 1)) {
+		return true;
+	} else {
+		return 'Please enter a whole non-zero number.';
+	}
+}
+
 //Function acts like a "homebase" for the customer, runs functions that 
 //display DB items and asks customer what they'd like to do
-function startCustomer() {
-    displayDB();
-    askCustomer();
-    // connection.connect(function (err) {
-    //     if (err) throw err;
-    //     console.log("connected as id " + connection.threadId);
-    //     displayDB();
-    //     askCustomer();
-    //     connection.end();
-    // });
-}
+// function startCustomer() {
+//     displayDB();
+//     askCustomer();
+//     // connection.connect(function (err) {
+//     //     if (err) throw err;
+//     //     console.log("connected as id " + connection.threadId);
+//     //     displayDB();
+//     //     askCustomer();
+//     //     connection.end();
+//     // });
+// }
 
 //This function displays the products available from the DB
 function displayDB() {
@@ -55,6 +67,7 @@ function displayDB() {
         console.log("\n");
         console.table(displayArr);
     })
+    askCustomer();
 }
 
 function askCustomer() {
@@ -66,17 +79,25 @@ function askCustomer() {
             {
                 type: "input",
                 name: "selectItem",
-                message: "Which item would you like to purchase?"
+                message: "Which item would you like to purchase?",
+                validate: validateInput,
+			    filter: Number
             },
             {
                 type: "input",
                 name: "selectQuantity",
-                message: "How many would you like to purchase?"
+                message: "How many would you like to purchase?",
+                validate: validateInput,
+			    filter: Number
             }
         ]).then(function (UserRes) {
+
             // console.log(UserRes);
             var itemNum = UserRes.selectItem;
             var itemQuan = UserRes.selectQuantity;
+
+            // Query db to confirm that the given item ID exists in the desired quantity
+		    var queryStr = 'SELECT * FROM products WHERE ?';
 
             DbRes.forEach(function (obj) {
                 if (itemNum == obj.item_id) {
@@ -109,12 +130,13 @@ function askCustomer() {
                     }
                 }
             })
-            startCustomer();
+            displayDB();
         })
     })
 }
 
-startCustomer();
+// startCustomer();
+displayDB();
 
   //The program automatically shows the product database as a table
         //Show ids, name, price, stock, dept
