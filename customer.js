@@ -54,8 +54,9 @@ function displayDB() {
         //Display product table in console
         console.log("\n");
         console.table(displayArr);
+        askCustomer();
     })
-    askCustomer();
+    // askCustomer();
 }
 
 function goAgain() {
@@ -102,13 +103,17 @@ function askCustomer() {
             if (err) throw (err);
 
             if (data.length === 0) {
-                console.log(chalk.red("Please enter a valid item id"));
+                console.log(chalk.red("\n Please enter a valid item id."));
                 displayDB();
             } else {
                 // console.log('data = ' + JSON.stringify(data));
                 var productData = data[0];
                 if (quantity <= productData.stock_quantity) {
-                    console.log(chalk.blue("Great, there are enough " + productData.product_name + " to purchase. Placing your order..."));
+                    if (quantity <= 1) {
+                        console.log(chalk.blue("\n Great, there's a " + productData.product_name + " to purchase. Placing your order..."));
+                    } else { 
+                        console.log(chalk.blue("\n Great, there are enough " + productData.product_name + "s to purchase. Placing your order..."));
+                    }
                     var newQuantity = parseFloat(productData.stock_quantity) - parseFloat(quantity);
                     var updateQueryString = 'UPDATE products SET stock_quantity=\"' + newQuantity + '\" WHERE item_id= \"' + item + "\"";
                     connection.query(updateQueryString, function (err, data) {
