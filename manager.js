@@ -46,7 +46,7 @@ function whatAction() {
                 console.log(chalk.green("You chose to View Low Inventory"));
                 break;
             case "Add to Inventory":
-                //   addInventory();
+                addInventory();
                 console.log(chalk.green("You chose to Add to Inventory"));
                 break;
             case "Add New Product":
@@ -128,19 +128,61 @@ function lowInventory() {
                 displayArr.push(product);
             }
         })
-        
+
         //Display product table in console
         console.log("\n");
         if (displayArr.length === 0) {
-            console.table(chalk.blue("There are no products with low inventory"));
+            console.table(chalk.blue("There are no products with low inventory.\n"));
 
         } else {
             console.table(displayArr);
         }
 
         //Calls prompt function
-        whatAction();
+        inquirer.prompt([
+            {
+                type: "list",
+                name: "next_action",
+                message: "Would you like to add more inventory for an item?",
+                choices: ["Yes", "No", "Exit"]
+            }
+        ]).then(function (res) {
+            var action = res.next_action;
+
+            switch (action) {
+                case "Yes":
+                    addInventory();
+                    console.log(chalk.green("You chose to Add Inventory"));
+                    break;
+                case "No":
+                    whatAction();
+                    break;
+                case "Exit":
+                    console.log(chalk.green("You chose to Exit the Manager Program"));
+                    process.exit();
+                    break;
+            }
+        })
     })
+}
+
+// validateInput makes sure that the user is supplying only positive integers for their inputs
+function validateInput(value) {
+    var integer = Number.isInteger(parseFloat(value));
+    var sign = Math.sign(value);
+
+    //If the user selects q, the program stops.
+    if (value === "q") {
+        process.exit();
+
+        //Else, if the input is an integer, program continues
+    } else if (integer && (sign === 1)) {
+        return true;
+
+        //Else, asks for an integer
+    } else {
+        return 'Please enter a whole non-zero number.';
+    }
 }
 
 //Add to Inventory
@@ -148,6 +190,55 @@ function lowInventory() {
 // Prompt user for how many they'd like to restock
 // If item-id isn't in DB, let user know that's not a valid response
 //Ask user what they'd like to do next
+function addInventory() {
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "selected_item",
+            message: "Which item would you like to order more stock for? Press Q to quit.",
+            validate: validateInput
+        },
+        {
+            type: "input",
+            name: "order_amt",
+            message: "How much stock would you like to order? Press Q to quit.",
+            validate: validateInput
+        }
+    ]).then(function (res) {
+        // console.log(res);
+        var item = res.selected_item;
+        var quantity = res.order_amt;
+
+        // Query db to confirm that the given item ID exists in the desired quantity
+        var queryStr = 'SELECT * FROM products WHERE ?';
+
+        //Connection quert where the item id is equal to the chosen #
+        connection.query(queryStr, { item_id: item }, function (err, data) {
+            if (err) throw (err);
+
+            //If there's no reponse for the selected # rerun the program
+            if (data.length === 0) {
+                console.log(chalk.red("\n Please enter a valid item id."));
+                addInventory();
+            } else {
+                //Var to grab the info for the first result
+                var productData = data[0];
+                var newQuantity = parseFloat(quantity) + parseFloat(productData.stock_quantity);
+
+                //Query string that will update the DB with the new quantity
+                var updateQueryString = 'UPDATE products SET stock_quantity=\"' + newQuantity + '\" WHERE item_id= \"' + item + "\"";
+                connection.query(updateQueryString, function(err,res){
+                    if (err) throw err;
+                    console.log(chalk.blue("\n============================================================"));
+                    console.log(chalk.blue("The new Stock Quantity for '" + productData.product_name + "' is " + newQuantity + "."));
+                    console.log(chalk.blue("============================================================\n"));
+                    whatAction();
+                })
+                
+            }
+        })
+    })
+}
 
 //Add New Product
 // Prompt user for the product...
