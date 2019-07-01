@@ -294,8 +294,16 @@ function addProduct() {
                 choices: deptArr
             }
         ]).then(function (res) {
-            console.log(res);
-    
+            // console.log(res);
+
+            var queryString = "INSERT INTO products (product_name, dept_name, price, stock_quantity)";
+                queryString += "VALUES ('" + res.new_name + "','" + res.new_dept + "','" + res.new_price + "','" + res.new_quantity + "');";
+            connection.query(queryString, function(err, res) {
+                if(err) throw err;
+                // console.log(queryString);
+                console.log("Product Added!");
+                viewProducts();
+            })
         })
     })
 
