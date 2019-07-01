@@ -2,7 +2,7 @@ require("dotenv").config();
 var chalk = require("chalk");
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-var table = require("console.table")
+var table = require("console.table");
 
 //Establishing credentials to SQL DB
 var connection = mysql.createConnection({
