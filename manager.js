@@ -172,14 +172,14 @@ function validateInput(value) {
     var sign = Math.sign(value);
 
     //If the user selects q, the program stops.
-    if (value === "q") {
+    if (value == "q") {
         process.exit();
 
-        //Else, if the input is an integer, program continues
+    //Else, if the input is an integer, program continues
     } else if (integer && (sign === 1)) {
         return true;
 
-        //Else, asks for an integer
+    //Else, asks for an integer
     } else {
         return 'Please enter a whole non-zero number.';
     }
@@ -250,59 +250,56 @@ function addInventory() {
 //Ask user if they'd like to add another product..
 //if no, ask what they'd like to do next
 function addProduct() {
-    var deptArr = [];
+   
     var deptQueryString = "SELECT dept_name FROM products";
     connection.query(deptQueryString, function (err, res) {
         if (err) throw err;
-        console.log(chalk.blue("\n============================================================"));
-        console.log(chalk.blue(JSON.stringify(res)));
-        console.log(chalk.blue("============================================================\n"));
+
+        // Empty array to push dept titles to
+        var deptArr = [];
+
+        // ForEach function only adds the deptname to array if it's unique
         res.forEach(function (data) {
-            console.log(data.dept_name);
-            var check = function () {
-                if (deptArr.find(data.dept_name) === 1) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            if (check === false) {
+            // console.log(data.dept_name);
+            if(deptArr.indexOf(data.dept_name) === -1) {
                 deptArr.push(data.dept_name);
-            }
+                console.log(deptArr);
+              }
             // deptArr.push(data.dept_name);
         })
-        console.log(deptArr);
+        // console.log("Department Array" + deptArr);
+
+        inquirer.prompt([
+            {
+                type: "input",
+                name: "new_name",
+                message: "What is the product called? Press Q to quit."
+            },
+            {
+                type: "input",
+                name: "new_price",
+                message: "What is the price of the product? Press Q to quit.",
+                validate: validateInput
+            },
+            {
+                type: "input",
+                name: "new_quantity",
+                message: "What quantity would you like to order?",
+                validate: validateInput
+            },
+            {
+                type: "list",
+                name: "new_dept",
+                message: "What department is this item listed?",
+                choices: deptArr
+            }
+        ]).then(function (res) {
+            console.log(res);
+    
+        })
     })
 
-    // inquirer.prompt([
-    //     {
-    //         type: "input",
-    //         name: "new_name",
-    //         message: "What is the product called? Press Q to quit."
-    //     },
-    //     {
-    //         type: "input",
-    //         name: "new_price",
-    //         message: "What is the price of the product? Press Q to quit.",
-    //         validate: validateInput
-    //     },
-    //     {
-    //         type: "input",
-    //         name: "new_quantity",
-    //         message: "What quantity would you like to order?",
-    //         validate: validateInput
-    //     },
-    //     {
-    //         type: "list",
-    //         name: "new_dept",
-    //         message: "What department is this item listed?",
-    //         choices: ["Food", "Games"]
-    //     }
-    // ]).then(function (res) {
-    //     console.log(res);
-
-    // })
+    
 }
 
 whatAction();
-// viewProducts();
