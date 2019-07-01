@@ -113,7 +113,7 @@ function lowInventory() {
 
         //ForEach goes through each result from the DB
         res.forEach(function (obj) {
-            if (obj.stock_quantity <= 5) {
+            if (obj.stock_quantity <= 50) {
                 //Makes a new empty object
                 var product = {};
 
