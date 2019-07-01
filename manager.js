@@ -50,7 +50,7 @@ function whatAction() {
                 console.log(chalk.green("You chose to Add to Inventory"));
                 break;
             case "Add New Product":
-                //   addProduct();
+                addProduct();
                 console.log(chalk.green("You chose to Add a New Product"));
                 break;
             case "Exit":
@@ -227,14 +227,14 @@ function addInventory() {
 
                 //Query string that will update the DB with the new quantity
                 var updateQueryString = 'UPDATE products SET stock_quantity=\"' + newQuantity + '\" WHERE item_id= \"' + item + "\"";
-                connection.query(updateQueryString, function(err,res){
+                connection.query(updateQueryString, function (err, res) {
                     if (err) throw err;
                     console.log(chalk.blue("\n============================================================"));
                     console.log(chalk.blue("The new Stock Quantity for '" + productData.product_name + "' is " + newQuantity + "."));
                     console.log(chalk.blue("============================================================\n"));
                     whatAction();
                 })
-                
+
             }
         })
     })
@@ -249,6 +249,60 @@ function addInventory() {
 //Then use connection query to add those values to DB
 //Ask user if they'd like to add another product..
 //if no, ask what they'd like to do next
+function addProduct() {
+    var deptArr = [];
+    var deptQueryString = "SELECT dept_name FROM products";
+    connection.query(deptQueryString, function (err, res) {
+        if (err) throw err;
+        console.log(chalk.blue("\n============================================================"));
+        console.log(chalk.blue(JSON.stringify(res)));
+        console.log(chalk.blue("============================================================\n"));
+        res.forEach(function (data) {
+            console.log(data.dept_name);
+            var check = function () {
+                if (deptArr.find(data.dept_name) === 1) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            if (check === false) {
+                deptArr.push(data.dept_name);
+            }
+            // deptArr.push(data.dept_name);
+        })
+        console.log(deptArr);
+    })
+
+    // inquirer.prompt([
+    //     {
+    //         type: "input",
+    //         name: "new_name",
+    //         message: "What is the product called? Press Q to quit."
+    //     },
+    //     {
+    //         type: "input",
+    //         name: "new_price",
+    //         message: "What is the price of the product? Press Q to quit.",
+    //         validate: validateInput
+    //     },
+    //     {
+    //         type: "input",
+    //         name: "new_quantity",
+    //         message: "What quantity would you like to order?",
+    //         validate: validateInput
+    //     },
+    //     {
+    //         type: "list",
+    //         name: "new_dept",
+    //         message: "What department is this item listed?",
+    //         choices: ["Food", "Games"]
+    //     }
+    // ]).then(function (res) {
+    //     console.log(res);
+
+    // })
+}
 
 whatAction();
 // viewProducts();
