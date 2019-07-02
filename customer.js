@@ -79,9 +79,8 @@ function goAgain() {
         }
     ]).then(function (res) {
         //If yes, run the displayDB function
-        if (res === "yes") {
+        if (res.confirm === "Yes") {
             displayDB();
-
         //Else, exit the program
         } else {
             process.exit();
@@ -132,8 +131,10 @@ function askCustomer() {
 
                     //Sees if the user ordered one item or multiple
                     if (quantity <= 1) {
+                        console.log(chalk.blue("\n============================================================"));
                         console.log(chalk.blue("\n Great, there's a " + productData.product_name + " to purchase. Placing your order..."));
                     } else { 
+                        console.log(chalk.blue("\n============================================================"));
                         console.log(chalk.blue("\n Great, there are enough " + productData.product_name + "s to purchase. Placing your order..."));
                     }
 
@@ -149,18 +150,18 @@ function askCustomer() {
 
                         //Getting the total cost of the purchase and logging to the console
                         var total = parseFloat(productData.price) * parseFloat(quantity);
-                        console.log(chalk.blue("Your order has been placed! Your total is $" + total + "."));
+                        console.log(chalk.blue("\n============================================================\n"));
+                        console.log(chalk.blue("Your order has been placed! Your total is $" + total + ".\n"));
                         console.log(chalk.blue("============================================================\n"));
 
-                        //End connection when finished
-                        connection.end();
 
                         //Ask user if they'd like to make a new purchase
                         goAgain();
                     })
                 } else {
                     //If user requests more quantity than is available log out to the console...
-                    console.log(chalk.red("\n Sorry, there is not enough product in stock. Please modify your order."));
+                    console.log(chalk.red("\n============================================================"));
+                    console.log(chalk.red("Sorry, there is not enough product in stock. Please modify your order."));
                     console.log(chalk.red("============================================================\n"));
 
                     //Restart the program
