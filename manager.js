@@ -23,7 +23,7 @@ var connection = mysql.createConnection({
 // Add New Product
 // When user selects one of these options, run the cooresponding function.
 
-// This function asks the user if they'd like to make another purchase
+// This function asks the manager what operation they'd like to do
 function whatAction() {
     inquirer.prompt([
         {
@@ -40,13 +40,13 @@ function whatAction() {
             case "View Products for Sale":
                 console.log(chalk.green("\n==============================="));
                 console.log(chalk.green("You chose to View Products"));
-                console.log(chalk.green("==============================="));
+                console.log(chalk.green("===============================\n"));
                 viewProducts();
                 break;
             case "View Low Inventory":
                 console.log(chalk.green("\n==============================="));
                 console.log(chalk.green("You chose to View Low Inventory"));
-                console.log(chalk.green("==============================="));
+                console.log(chalk.green("===============================\n"));
                 lowInventory();
                 break;
             case "Add to Inventory":
@@ -58,13 +58,13 @@ function whatAction() {
             case "Add New Product":
                 console.log(chalk.green("\n==============================="));
                 console.log(chalk.green("You chose to Add a New Product"));
-                console.log(chalk.green("==============================="));
+                console.log(chalk.green("===============================\n"));
                 addProduct();
                 break;
             case "Exit":
                 console.log(chalk.green("\n==============================="));
                 console.log(chalk.green("You chose to Exit the Manager Program"));
-                console.log(chalk.green("==============================="));
+                console.log(chalk.green("===============================\n"));
                 process.exit();
                 break;
         }
@@ -142,7 +142,10 @@ function lowInventory() {
         //Display product table in console
         console.log("\n");
         if (displayArr.length === 0) {
-            console.table(chalk.blue("There are no products with low inventory.\n"));
+            console.log(chalk.blue("\n============================================================"));
+            console.table(chalk.blue("There are no products with low inventory."));
+            console.log(chalk.blue("============================================================\n"));
+
 
         } else {
             console.table(displayArr);
@@ -161,14 +164,18 @@ function lowInventory() {
 
             switch (action) {
                 case "Yes":
-                    addInventory();
+                    console.log(chalk.green("\n============================================================"));
                     console.log(chalk.green("You chose to Add Inventory"));
+                    console.log(chalk.green("============================================================\n"));
+                    addInventory();
                     break;
                 case "No":
                     whatAction();
                     break;
                 case "Exit":
+                    console.log(chalk.green("\n============================================================"));
                     console.log(chalk.green("You chose to Exit the Manager Program"));
+                    console.log(chalk.green("============================================================\n"));
                     process.exit();
                     break;
             }
@@ -200,6 +207,8 @@ function validateInput(value) {
 // Prompt user for how many they'd like to restock
 // If item-id isn't in DB, let user know that's not a valid response
 //Ask user what they'd like to do next
+
+//This function lets the manager order inventory for an item
 function addInventory() {
     inquirer.prompt([
         {
@@ -273,16 +282,15 @@ function addProduct() {
             // console.log(data.dept_name);
             if(deptArr.indexOf(data.dept_name) === -1) {
                 deptArr.push(data.dept_name);
-                console.log(deptArr);
+                // console.log(deptArr);
               }
-            // deptArr.push(data.dept_name);
         })
    
         inquirer.prompt([
             {
                 type: "input",
                 name: "new_name",
-                message: "What is the product called? Press Q to quit."
+                message: "What is the product called? Press Q to quit.",
             },
             {
                 type: "input",
@@ -303,13 +311,13 @@ function addProduct() {
                 choices: deptArr
             }
         ]).then(function (res) {
-
+            //Take user input and put into query for the DB - adding new row with data
             var queryString = "INSERT INTO products (product_name, dept_name, price, stock_quantity)";
                 queryString += "VALUES ('" + res.new_name + "','" + res.new_dept + "','" + res.new_price + "','" + res.new_quantity + "');";
             connection.query(queryString, function(err, res) {
                 if(err) throw err;
                 console.log(chalk.blue("============================================================\n"));
-                console.log("Product Added!");
+                console.log(chalk.blue("Product Added!"));
                 console.log(chalk.blue("============================================================\n"));
 
                 viewProducts();
