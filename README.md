@@ -49,4 +49,4 @@ To run the manager interface please follow the steps below:
 
 You can watch the demo of the Bamazon customer and manager interfaces at the link below.
 
-[Bamazon Demo](#)
+[Bamazon Demo](https://youtu.be/fjXcylzGS14)
