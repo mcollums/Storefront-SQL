@@ -38,23 +38,33 @@ function whatAction() {
 
         switch (action) {
             case "View Products for Sale":
-                viewProducts();
+                console.log(chalk.green("\n==============================="));
                 console.log(chalk.green("You chose to View Products"));
+                console.log(chalk.green("==============================="));
+                viewProducts();
                 break;
             case "View Low Inventory":
-                lowInventory();
+                console.log(chalk.green("\n==============================="));
                 console.log(chalk.green("You chose to View Low Inventory"));
+                console.log(chalk.green("==============================="));
+                lowInventory();
                 break;
             case "Add to Inventory":
-                addInventory();
+                console.log(chalk.green("\n==============================="));
                 console.log(chalk.green("You chose to Add to Inventory"));
+                console.log(chalk.green("===============================\n"));
+                addInventory();
                 break;
             case "Add New Product":
-                addProduct();
+                console.log(chalk.green("\n==============================="));
                 console.log(chalk.green("You chose to Add a New Product"));
+                console.log(chalk.green("==============================="));
+                addProduct();
                 break;
             case "Exit":
+                console.log(chalk.green("\n==============================="));
                 console.log(chalk.green("You chose to Exit the Manager Program"));
+                console.log(chalk.green("==============================="));
                 process.exit();
                 break;
         }
@@ -267,8 +277,7 @@ function addProduct() {
               }
             // deptArr.push(data.dept_name);
         })
-        // console.log("Department Array" + deptArr);
-
+   
         inquirer.prompt([
             {
                 type: "input",
@@ -294,14 +303,15 @@ function addProduct() {
                 choices: deptArr
             }
         ]).then(function (res) {
-            // console.log(res);
 
             var queryString = "INSERT INTO products (product_name, dept_name, price, stock_quantity)";
                 queryString += "VALUES ('" + res.new_name + "','" + res.new_dept + "','" + res.new_price + "','" + res.new_quantity + "');";
             connection.query(queryString, function(err, res) {
                 if(err) throw err;
-                // console.log(queryString);
+                console.log(chalk.blue("============================================================\n"));
                 console.log("Product Added!");
+                console.log(chalk.blue("============================================================\n"));
+
                 viewProducts();
             })
         })
